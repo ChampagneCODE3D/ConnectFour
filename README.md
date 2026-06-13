@@ -74,6 +74,21 @@ A console-based Connect Four game built in C# using Object-Oriented Programming 
 
 ---
 
+## AI Tool Declaration
+
+This project was developed with the assistance of **GitHub Copilot** (an AI programming assistant by Microsoft/GitHub).
+
+| What AI was used for | What the student did |
+|----------------------|----------------------|
+| Setting up the GitHub repository and git structure | Reviewed, approved, and submitted all steps |
+| Generating the initial OO design plan and class breakdown | Evaluated the design against assignment requirements |
+| Writing boilerplate/scaffold code for classes | Will review, understand, modify, and extend all code |
+| Suggesting task breakdown and milestone structure | Made final decisions on scope and priorities |
+
+> All code submitted is understood by the developer. AI was used as a learning and productivity tool, not to bypass understanding of the material.
+
+---
+
 ## How to Run
 
 ```bash
