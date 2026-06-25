@@ -74,6 +74,42 @@ A console-based Connect Four game built in C# using Object-Oriented Programming 
 
 ---
 
+## Rubric Coverage (SODV 1202)
+
+### A) Design (10 Marks)
+- Clean class structure with clear responsibilities (`Board`, `Player`, `HumanPlayer`, `ComputerPlayer`, `GameView`, `GameController`).
+- Abstraction via `Player` abstract class.
+- Encapsulation via private board grid and controlled board operations.
+- Inheritance via human/computer player subclasses.
+- Polymorphism via shared `GetMove(Board board)` contract.
+
+### B) Effort (15 Marks)
+- Milestones tracked with completion checklist in this README.
+- Public GitHub repository with iterative commits.
+- Automated tests and manual UI test checklist documented in `TESTING.md`.
+- Codebase follows consistent naming and style.
+
+### C) Functionality (5 Marks)
+- 7x6 board with move validation.
+- Win detection for horizontal, vertical, and both diagonal directions.
+- Draw detection.
+- Human vs Human and Human vs Computer game modes.
+- Replay/start-screen flow after each game.
+
+---
+
+## Final Submission Checklist
+
+- [x] Console application runs successfully (`dotnet run`)
+- [x] Automated tests pass (`dotnet test`)
+- [x] Build is successful (`dotnet build`)
+- [ ] Manual UI checklist completed in `TESTING.md`
+- [ ] Demo video recorded and uploaded
+- [ ] Final commit pushed to GitHub
+- [ ] Repository link submitted in D2L
+
+---
+
 ## AI Tool Declaration
 
 This project was developed with the assistance of **GitHub Copilot** (an AI programming assistant by Microsoft/GitHub).
