@@ -47,28 +47,28 @@ A console-based Connect Four game built in C# using Object-Oriented Programming 
 - [x] Add README and .gitignore
 - [x] Make initial commit
 
-### Milestone 4 — Core Classes
-- [ ] Implement `Board` class (grid, drop piece, win/draw check)
-- [ ] Implement `Player` abstract class
-- [ ] Implement `HumanPlayer` class
-- [ ] Implement `ComputerPlayer` class with basic AI
-- [ ] Implement `GameView` class
-- [ ] Implement `GameController` class
+### Milestone 4 — Core Classes ✅
+- [x] Implement `Board` class (grid, drop piece, win/draw check)
+- [x] Implement `Player` abstract class
+- [x] Implement `HumanPlayer` class
+- [x] Implement `ComputerPlayer` class with basic AI
+- [x] Implement `GameView` class
+- [x] Implement `GameController` class
 
-### Milestone 5 — Two-Player Mode
-- [ ] Human vs Human works end-to-end
-- [ ] Win detection working for all directions
-- [ ] Draw detection working
-- [ ] Play again / return to start screen
+### Milestone 5 — Two-Player Mode ✅
+- [x] Human vs Human works end-to-end
+- [x] Win detection working for all directions
+- [x] Draw detection working
+- [x] Play again / return to start screen
 
-### Milestone 6 — AI Mode (Optional)
-- [ ] Human vs Computer mode selectable from menu
-- [ ] AI blocks opponent winning moves
-- [ ] AI takes winning moves when available
+### Milestone 6 — AI Mode (Optional) ✅
+- [x] Human vs Computer mode selectable from menu
+- [x] AI blocks opponent winning moves
+- [x] AI takes winning moves when available
 
 ### Milestone 7 — Final Submission
-- [ ] Full game runs without crashes
-- [ ] Code is clean and commented
+- [x] Full game runs without crashes
+- [x] Code is clean and commented
 - [ ] Final commit pushed to GitHub
 - [ ] Demo video recorded
 
@@ -89,7 +89,33 @@ This project was developed with the assistance of **GitHub Copilot** (an AI prog
 
 ---
 
-## How to Run
+## Testing
+
+Run automated tests for core board logic:
+
+```bash
+dotnet test ConnectFour.Tests/ConnectFour.Tests.csproj
+```
+
+## Web Version (JavaScript + GitHub Pages)
+
+A browser version of the game is included in the `docs/` folder.
+
+### Run locally
+
+Open `docs/index.html` in your browser.
+
+### Publish on GitHub Pages
+
+1. Push the repository to GitHub.
+2. In repository settings, open **Pages**.
+3. Set source to **Deploy from a branch**.
+4. Select branch `master` and folder `/docs`.
+5. Save. Your live game will be available at:
+
+`https://champagnecode3d.github.io/ConnectFour/`
+
+## How to Run (Console C# App)
 
 ```bash
 dotnet run

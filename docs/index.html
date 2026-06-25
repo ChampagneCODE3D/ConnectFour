@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connect Four</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Connect Four</h1>
+
+    <section class="panel">
+      <label for="mode">Mode:</label>
+      <select id="mode">
+        <option value="hvh">Human vs Human</option>
+        <option value="hvc">Human vs Computer</option>
+      </select>
+      <button id="newGameBtn">New Game</button>
+    </section>
+
+    <p id="status" class="status"></p>
+
+    <div class="board-shell">
+      <div id="columnButtons" class="column-buttons"></div>
+      <div id="board" class="board"></div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
