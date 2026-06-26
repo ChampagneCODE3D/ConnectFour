@@ -94,8 +94,14 @@ public class GameController
                 return false;
             }
 
+            AiDifficulty? difficulty = _view.DisplayDifficultyMenu();
+            if (!difficulty.HasValue)
+            {
+                return false;
+            }
+
             _player1 = new HumanPlayer('X', name);
-            _player2 = new ComputerPlayer('O');
+            _player2 = new ComputerPlayer('O', difficulty.Value);
         }
 
         _currentPlayer = _player1;

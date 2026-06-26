@@ -13,19 +13,25 @@ dotnet run --project ConnectFour.csproj
 | ID | Scenario | Steps | Expected | Result |
 |---|---|---|---|---|
 | UI-01 | App launches | Start app | Welcome banner + mode menu appear | [x] Pass / [ ] Fail |
-| UI-02 | Invalid menu input | Enter `0`, `3`, `abc` | Validation message; prompts again | [ ] Pass / [ ] Fail |
+| UI-02 | Esc in main menu | Press `Esc`, choose return then exit | Return resumes prompt; exit closes game | [ ] Pass / [ ] Fail |
 | UI-03 | HvH names | Choose `1`, enter names | Game starts, symbols assigned | [ ] Pass / [ ] Fail |
-| UI-04 | Column bounds | Enter `0` or `8` in turn | Validation message; no crash | [ ] Pass / [ ] Fail |
-| UI-05 | Non-numeric move | Enter `abc` in turn | Validation message; no crash | [ ] Pass / [ ] Fail |
-| UI-06 | Full column handling | Fill one column then play same column | "column is full" message | [ ] Pass / [ ] Fail |
-| UI-07 | Horizontal win | Play sequence to create horizontal 4 | Winner banner shown | [ ] Pass / [ ] Fail |
-| UI-08 | Vertical win | Play sequence to create vertical 4 | Winner banner shown | [ ] Pass / [ ] Fail |
-| UI-09 | Diagonal win | Play sequence to create diagonal 4 | Winner banner shown | [ ] Pass / [ ] Fail |
-| UI-10 | Draw | Fill board with no 4-in-a-row | Draw banner shown | [ ] Pass / [ ] Fail |
-| UI-11 | Replay yes | End game, enter `y` | Returns to menu/start screen | [ ] Pass / [ ] Fail |
-| UI-12 | Replay no | End game, enter `n` | Goodbye + exits cleanly | [ ] Pass / [ ] Fail |
-| UI-13 | HvC mode | Choose `2` | Human vs Computer starts | [ ] Pass / [ ] Fail |
-| UI-14 | AI behavior | Observe several turns | AI makes legal moves, blocks/wins at times | [ ] Pass / [ ] Fail |
+| UI-04 | Name edit behavior | Use backspace and spaces in name | Name input edits correctly, normalized spacing | [ ] Pass / [ ] Fail |
+| UI-05 | Name length limit | Enter name with 101+ chars | Error shown, prompt retries | [ ] Pass / [ ] Fail |
+| UI-06 | Esc in name prompt | Press `Esc`, return to prompt | Return keeps setup flow active | [ ] Pass / [ ] Fail |
+| UI-07 | HvC difficulty select | Choose `2`, pick difficulty `1/2/3` | Easy/Medium/Hard selection works | [ ] Pass / [ ] Fail |
+| UI-08 | Esc in difficulty prompt | Press `Esc`, choose return then exit | Return resumes difficulty prompt; exit closes game | [ ] Pass / [ ] Fail |
+| UI-09 | Column bounds | Enter `0` or `8` in turn | Validation message; no crash | [ ] Pass / [ ] Fail |
+| UI-10 | Non-numeric move | Enter letter/symbol in turn | Validation message; no crash | [ ] Pass / [ ] Fail |
+| UI-11 | Full column handling | Fill one column then pick it again | Dynamic prompt lists valid columns only | [ ] Pass / [ ] Fail |
+| UI-12 | Esc during move prompt | Press `Esc`, choose return then exit | Return resumes move prompt; exit closes game | [ ] Pass / [ ] Fail |
+| UI-13 | Horizontal win | Play sequence to create horizontal 4 | Winner banner shown | [ ] Pass / [ ] Fail |
+| UI-14 | Vertical win | Play sequence to create vertical 4 | Winner banner shown | [ ] Pass / [ ] Fail |
+| UI-15 | Diagonal win | Play sequence to create diagonal 4 | Winner banner shown | [ ] Pass / [ ] Fail |
+| UI-16 | Draw | Fill board with no 4-in-a-row | Draw banner shown | [ ] Pass / [ ] Fail |
+| UI-17 | Replay yes | End game, enter `y` | Returns to menu/start screen | [ ] Pass / [ ] Fail |
+| UI-18 | Replay no | End game, enter `n` | Goodbye + exits cleanly | [ ] Pass / [ ] Fail |
+| UI-19 | Esc in replay prompt | Press `Esc` at replay prompt | Exit menu appears with return/exit choices | [ ] Pass / [ ] Fail |
+| UI-20 | AI behavior by difficulty | Observe Easy vs Medium vs Hard rounds | Easy random, Medium win/block, Hard stronger positioning | [ ] Pass / [ ] Fail |
 
 ## Automated Tests
 

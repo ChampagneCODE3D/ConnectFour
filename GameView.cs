@@ -94,6 +94,60 @@ public class GameView
     }
 
     /// <summary>
+    /// Displays the AI difficulty menu and gets the player's choice.
+    /// </summary>
+    /// <returns>Difficulty level or null if user requested exit.</returns>
+    public AiDifficulty? DisplayDifficultyMenu()
+    {
+        Console.WriteLine();
+        Console.WriteLine("SELECT AI DIFFICULTY:");
+        Console.WriteLine("1. Easy (random moves)");
+        Console.WriteLine("2. Medium (win/block strategy)");
+        Console.WriteLine("3. Hard (stronger positioning)");
+        Console.WriteLine("Esc. Exit menu");
+        Console.WriteLine();
+
+        Console.Write("Enter your choice (1, 2, or 3): ");
+
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+
+            if (key.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine();
+
+                if (ConsolePrompts.ShowExitConfirmation())
+                {
+                    return null;
+                }
+
+                Console.WriteLine();
+                Console.Write("Enter your choice (1, 2, or 3): ");
+                continue;
+            }
+
+            if (key.KeyChar == '1')
+            {
+                Console.WriteLine('1');
+                return AiDifficulty.Easy;
+            }
+
+            if (key.KeyChar == '2')
+            {
+                Console.WriteLine('2');
+                return AiDifficulty.Medium;
+            }
+
+            if (key.KeyChar == '3')
+            {
+                Console.WriteLine('3');
+                return AiDifficulty.Hard;
+            }
+        }
+    }
+
+    /// <summary>
     /// Displays the winner announcement.
     /// </summary>
     /// <param name="winner">The player who won the game.</param>
