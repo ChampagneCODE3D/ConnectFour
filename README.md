@@ -110,18 +110,41 @@ A console-based Connect Four game built in C# using Object-Oriented Programming 
 
 ---
 
-## AI Tool Declaration
+## AI Tool Declaration (Detailed by File)
 
-This project was developed with the assistance of **GitHub Copilot** (an AI programming assistant by Microsoft/GitHub).
+This project was developed with assistance from **GitHub Copilot**. All generated suggestions were reviewed, edited, tested, and approved by the developer before submission.
 
-| What AI was used for | What the student did |
-|----------------------|----------------------|
-| Setting up the GitHub repository and git structure | Reviewed, approved, and submitted all steps |
-| Generating the initial OO design plan and class breakdown | Evaluated the design against assignment requirements |
-| Writing boilerplate/scaffold code for classes | Will review, understand, modify, and extend all code |
-| Suggesting task breakdown and milestone structure | Made final decisions on scope and priorities |
+### C# Console Application Files
 
-> All code submitted is understood by the developer. AI was used as a learning and productivity tool, not to bypass understanding of the material.
+| File | How AI Assisted | Developer Contribution |
+|------|------------------|------------------------|
+| `Program.cs` | Suggested entry-point scaffold. | Verified startup flow and controller initialization. |
+| `Board.cs` | Assisted with board model structure, drop logic, and win/draw checking patterns. | Validated logic correctness, adjusted behavior, and verified with tests. |
+| `Player.cs` | Suggested abstract base contract (`GetMove`). | Confirmed abstraction design and naming consistency. |
+| `HumanPlayer.cs` | Assisted with input handling loop and validation structure. | Tightened input UX (strict numeric rules + dynamic available-column prompts/messages). |
+| `ComputerPlayer.cs` | Suggested rule-based AI approach (win/block/random). | Reviewed and validated game-play behavior manually. |
+| `GameView.cs` | Assisted with menu/board display scaffolding. | Refined menu input behavior to accept only valid mode keys. |
+| `GameController.cs` | Assisted with game-loop/controller structure. | Tightened player-name normalization and validation rules. |
+
+### Test and Documentation Files
+
+| File | How AI Assisted | Developer Contribution |
+|------|------------------|------------------------|
+| `ConnectFour.Tests/UnitTest1.cs` | Suggested xUnit test case scaffolds for board behaviors. | Selected test coverage, ran tests, and confirmed passing results. |
+| `TESTING.md` | Assisted with manual test checklist structure. | Executed and documented validation workflow. |
+| `README.md` | Assisted with documentation formatting and rubric mapping language. | Finalized wording, milestone status, and submission evidence. |
+
+### Web Port Files (Hosted on GitHub Pages)
+
+| File | How AI Assisted | Developer Contribution |
+|------|------------------|------------------------|
+| `docs/index.html` | Suggested web UI layout scaffold. | Reviewed structure and game controls for assignment goals. |
+| `docs/style.css` | Suggested styling baseline for board and controls. | Adjusted visual layout and readability. |
+| `docs/app.js` | Assisted with JavaScript port of core game logic and simple AI behavior. | Verified behavior parity with C# version and prepared for GitHub Pages hosting. |
+
+> Note: The live hosted web version is implemented in **JavaScript** (for static GitHub Pages hosting), not Java.
+
+> AI was used as a productivity and learning aid. Final design decisions, validation, testing, and submission responsibility remain with the developer.
 
 ---
 
