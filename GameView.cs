@@ -81,13 +81,7 @@ public class GameView
     /// <returns>1 for Human vs Human, 2 for Human vs Computer, or 0 to exit.</returns>
     public int DisplayMenu()
     {
-        Console.WriteLine("SELECT GAME MODE:");
-        Console.WriteLine("1. Human vs Human");
-        Console.WriteLine("2. Human vs Computer");
-        Console.WriteLine("Esc. Exit menu");
-        Console.WriteLine();
-
-        Console.Write("Enter your choice (1 or 2): ");
+        WriteModeMenu();
 
         while (true)
         {
@@ -97,18 +91,15 @@ public class GameView
             {
                 Console.WriteLine();
 
-                if (ConsolePrompts.ShowExitConfirmation())
+                UserFlowAction action = ConsolePrompts.ShowExitConfirmation();
+                if (action == UserFlowAction.ExitGame)
                 {
                     return 0;
                 }
 
-                Console.WriteLine();
-                Console.WriteLine("SELECT GAME MODE:");
-                Console.WriteLine("1. Human vs Human");
-                Console.WriteLine("2. Human vs Computer");
-                Console.WriteLine("Esc. Exit menu");
-                Console.WriteLine();
-                Console.Write("Enter your choice (1 or 2): ");
+                Console.Clear();
+                DisplayWelcome();
+                WriteModeMenu();
                 continue;
             }
 
@@ -123,18 +114,10 @@ public class GameView
     /// <summary>
     /// Displays the AI difficulty menu and gets the player's choice.
     /// </summary>
-    /// <returns>Difficulty level or null if user requested exit.</returns>
-    public AiDifficulty? DisplayDifficultyMenu()
+    /// <returns>Tuple of flow action and optional selected difficulty.</returns>
+    public (UserFlowAction Action, AiDifficulty? Difficulty) DisplayDifficultyMenu()
     {
-        Console.WriteLine();
-        Console.WriteLine("SELECT AI DIFFICULTY:");
-        Console.WriteLine("1. Easy (random moves)");
-        Console.WriteLine("2. Medium (win/block strategy)");
-        Console.WriteLine("3. Hard (stronger positioning)");
-        Console.WriteLine("Esc. Exit menu");
-        Console.WriteLine();
-
-        Console.Write("Enter your choice (1, 2, or 3): ");
+        WriteDifficultyMenu();
 
         while (true)
         {
@@ -144,40 +127,57 @@ public class GameView
             {
                 Console.WriteLine();
 
-                if (ConsolePrompts.ShowExitConfirmation())
+                UserFlowAction action = ConsolePrompts.ShowExitConfirmation();
+                if (action != UserFlowAction.Continue)
                 {
-                    return null;
+                    return (action, null);
                 }
 
-                Console.WriteLine();
-                Console.WriteLine("SELECT AI DIFFICULTY:");
-                Console.WriteLine("1. Easy (random moves)");
-                Console.WriteLine("2. Medium (win/block strategy)");
-                Console.WriteLine("3. Hard (stronger positioning)");
-                Console.WriteLine("Esc. Exit menu");
-                Console.WriteLine();
-                Console.Write("Enter your choice (1, 2, or 3): ");
+                Console.Clear();
+                WriteDifficultyMenu();
                 continue;
             }
 
             if (key.KeyChar == '1')
             {
                 Console.WriteLine('1');
-                return AiDifficulty.Easy;
+                return (UserFlowAction.Continue, AiDifficulty.Easy);
             }
 
             if (key.KeyChar == '2')
             {
                 Console.WriteLine('2');
-                return AiDifficulty.Medium;
+                return (UserFlowAction.Continue, AiDifficulty.Medium);
             }
 
             if (key.KeyChar == '3')
             {
                 Console.WriteLine('3');
-                return AiDifficulty.Hard;
+                return (UserFlowAction.Continue, AiDifficulty.Hard);
             }
         }
+    }
+
+    private static void WriteModeMenu()
+    {
+        Console.WriteLine("SELECT GAME MODE:");
+        Console.WriteLine("1. Human vs Human");
+        Console.WriteLine("2. Human vs Computer");
+        Console.WriteLine("Esc. Exit menu");
+        Console.WriteLine();
+        Console.Write("Enter your choice (1 or 2): ");
+    }
+
+    private static void WriteDifficultyMenu()
+    {
+        Console.WriteLine();
+        Console.WriteLine("SELECT AI DIFFICULTY:");
+        Console.WriteLine("1. Easy (random moves)");
+        Console.WriteLine("2. Medium (win/block strategy)");
+        Console.WriteLine("3. Hard (stronger positioning)");
+        Console.WriteLine("Esc. Exit menu");
+        Console.WriteLine();
+        Console.Write("Enter your choice (1, 2, or 3): ");
     }
 
     /// <summary>
@@ -206,31 +206,63 @@ public class GameView
     }
 
     /// <summary>
-    /// Asks if the players want to play again.
+    /// Asks for post-game next action.
     /// </summary>
-    /// <returns>True if they want to play again, false otherwise.</returns>
-    public bool AskPlayAgain()
+    /// <returns>User flow action for rematch, main menu, or exit.</returns>
+    public UserFlowAction AskPostGameAction()
     {
         while (true)
         {
-            if (!ConsolePrompts.TryReadLineWithEscape("Play again? (y/n): ", out string rawInput))
+            UserFlowAction action = ConsolePrompts.TryReadLineWithEscape("Play again with same players? (y/n): ", out string rawInput);
+            if (action == UserFlowAction.ExitGame)
             {
-                return false;
+                return UserFlowAction.ExitGame;
+            }
+
+            if (action == UserFlowAction.RestartToMenu)
+            {
+                return UserFlowAction.RestartToMenu;
             }
 
             string input = rawInput.Trim().ToLowerInvariant();
 
             if (input == "y" || input == "yes")
             {
-                return true;
+                return UserFlowAction.Continue;
             }
 
             if (input == "n" || input == "no")
             {
-                return false;
+                return ShowModeOrQuitMenu();
             }
 
             Console.WriteLine("Invalid choice. Enter y or n.");
+        }
+    }
+
+    private static UserFlowAction ShowModeOrQuitMenu()
+    {
+        Console.WriteLine();
+        Console.WriteLine("Next Step");
+        Console.WriteLine("1. Return to start menu");
+        Console.WriteLine("2. Quit game");
+        Console.Write("Choose 1 or 2: ");
+
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+
+            if (key.KeyChar == '1')
+            {
+                Console.WriteLine('1');
+                return UserFlowAction.RestartToMenu;
+            }
+
+            if (key.KeyChar == '2' || key.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine('2');
+                return UserFlowAction.ExitGame;
+            }
         }
     }
 

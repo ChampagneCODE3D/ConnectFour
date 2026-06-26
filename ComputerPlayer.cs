@@ -14,7 +14,8 @@ public class ComputerPlayer : Player
     /// </summary>
     /// <param name="symbol">The symbol representing this player on the board.</param>
     /// <param name="difficulty">The AI difficulty level.</param>
-    public ComputerPlayer(char symbol, AiDifficulty difficulty) : base(symbol, "Computer")
+    /// <param name="name">The display name for the computer player.</param>
+    public ComputerPlayer(char symbol, AiDifficulty difficulty, string name = "Computer") : base(symbol, name)
     {
         _difficulty = difficulty;
     }

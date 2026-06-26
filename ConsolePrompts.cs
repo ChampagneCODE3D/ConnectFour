@@ -2,13 +2,14 @@ namespace ConnectFour;
 
 public static class ConsolePrompts
 {
-    public static bool ShowExitConfirmation()
+    public static UserFlowAction ShowExitConfirmation()
     {
         Console.WriteLine();
         Console.WriteLine("Exit Menu");
         Console.WriteLine("1. Return to game");
-        Console.WriteLine("2. Exit game");
-        Console.Write("Choose 1 or 2: ");
+        Console.WriteLine("2. Restart to main menu");
+        Console.WriteLine("3. Exit game");
+        Console.Write("Choose 1, 2, or 3: ");
 
         while (true)
         {
@@ -17,13 +18,19 @@ public static class ConsolePrompts
             if (key.KeyChar == '1')
             {
                 Console.WriteLine('1');
-                return false;
+                return UserFlowAction.Continue;
             }
 
-            if (key.KeyChar == '2' || key.Key == ConsoleKey.Escape)
+            if (key.KeyChar == '2')
             {
                 Console.WriteLine('2');
-                return true;
+                return UserFlowAction.RestartToMenu;
+            }
+
+            if (key.KeyChar == '3' || key.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine('3');
+                return UserFlowAction.ExitGame;
             }
         }
     }
@@ -32,7 +39,7 @@ public static class ConsolePrompts
     /// Poka-yoke style confirmation gate: only Enter advances the flow.
     /// Escape routes to a confirm-exit menu to prevent accidental progression.
     /// </summary>
-    public static bool WaitForEnterWithEscape(string prompt)
+    public static UserFlowAction WaitForEnterWithEscape(string prompt)
     {
         while (true)
         {
@@ -45,10 +52,11 @@ public static class ConsolePrompts
                 if (key.Key == ConsoleKey.Escape)
                 {
                     Console.WriteLine();
+                    UserFlowAction action = ShowExitConfirmation();
 
-                    if (ShowExitConfirmation())
+                    if (action != UserFlowAction.Continue)
                     {
-                        return false;
+                        return action;
                     }
 
                     Console.WriteLine();
@@ -58,13 +66,13 @@ public static class ConsolePrompts
                 if (key.Key == ConsoleKey.Enter)
                 {
                     Console.WriteLine();
-                    return true;
+                    return UserFlowAction.Continue;
                 }
             }
         }
     }
 
-    public static bool TryReadLineWithEscape(string prompt, out string input)
+    public static UserFlowAction TryReadLineWithEscape(string prompt, out string input)
     {
         while (true)
         {
@@ -78,11 +86,12 @@ public static class ConsolePrompts
                 if (key.Key == ConsoleKey.Escape)
                 {
                     Console.WriteLine();
+                    UserFlowAction action = ShowExitConfirmation();
 
-                    if (ShowExitConfirmation())
+                    if (action != UserFlowAction.Continue)
                     {
                         input = string.Empty;
-                        return false;
+                        return action;
                     }
 
                     Console.WriteLine();
@@ -93,7 +102,7 @@ public static class ConsolePrompts
                 {
                     Console.WriteLine();
                     input = new string([.. chars]);
-                    return true;
+                    return UserFlowAction.Continue;
                 }
 
                 if (key.Key == ConsoleKey.Backspace)

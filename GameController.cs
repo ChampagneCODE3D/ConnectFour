@@ -28,25 +28,53 @@ public class GameController
     {
         _view.DisplayWelcome();
 
-        bool playAgain = true;
+        bool exitGame = false;
 
-        while (playAgain)
+        while (!exitGame)
         {
-            if (!SetupGame())
+            UserFlowAction setupAction = SetupGame();
+            if (setupAction == UserFlowAction.ExitGame)
             {
                 break;
             }
 
-            if (!PlayGame())
-            {
-                break;
-            }
-
-            playAgain = _view.AskPlayAgain();
-
-            if (playAgain)
+            if (setupAction == UserFlowAction.RestartToMenu)
             {
                 _view.DisplayWelcome();
+                continue;
+            }
+
+            while (true)
+            {
+                UserFlowAction playAction = PlayGame();
+                if (playAction == UserFlowAction.ExitGame)
+                {
+                    exitGame = true;
+                    break;
+                }
+
+                if (playAction == UserFlowAction.RestartToMenu)
+                {
+                    _view.DisplayWelcome();
+                    break;
+                }
+
+                UserFlowAction postGameAction = _view.AskPostGameAction();
+                if (postGameAction == UserFlowAction.Continue)
+                {
+                    _board = new Board();
+                    _currentPlayer = _player1;
+                    continue;
+                }
+
+                if (postGameAction == UserFlowAction.RestartToMenu)
+                {
+                    _view.DisplayWelcome();
+                    break;
+                }
+
+                exitGame = true;
+                break;
             }
         }
 
@@ -56,13 +84,13 @@ public class GameController
     /// <summary>
     /// Sets up the game based on the selected game mode.
     /// </summary>
-    /// <returns>True if setup completed, false if user requested exit.</returns>
-    private bool SetupGame()
+    /// <returns>Flow action after setup prompt handling.</returns>
+    private UserFlowAction SetupGame()
     {
         int gameMode = _view.DisplayMenu();
         if (gameMode == 0)
         {
-            return false;
+            return UserFlowAction.ExitGame;
         }
 
         _board = new Board();
@@ -70,38 +98,74 @@ public class GameController
         if (gameMode == 1)
         {
             // Human vs Human
-            string? name1 = PromptForPlayerName("\nPlayer 1, enter your name: ", "Player 1");
-            if (name1 is null)
+            (UserFlowAction action, string? name) = PromptForPlayerName("\nPlayer 1, enter your name: ", "Player 1");
+            if (action != UserFlowAction.Continue)
             {
-                return false;
+                return action;
             }
 
-            string? name2 = PromptForPlayerName("Player 2, enter your name: ", "Player 2");
-            if (name2 is null)
+            string name1 = name!;
+            string? name2;
+
+            while (true)
             {
-                return false;
+                (action, name) = PromptForPlayerName("Player 2, enter your name: ", "Player 2");
+                if (action != UserFlowAction.Continue)
+                {
+                    return action;
+                }
+
+                name2 = name;
+                if (string.Equals(name1, name2, StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Player 2 name must be different from Player 1.");
+                    continue;
+                }
+
+                break;
             }
 
             _player1 = new HumanPlayer('X', name1);
-            _player2 = new HumanPlayer('O', name2);
+            _player2 = new HumanPlayer('O', name2!);
         }
         else
         {
             // Human vs Computer
-            string? name = PromptForPlayerName("\nEnter your name: ", "Player");
-            if (name is null)
+            (UserFlowAction action, string? name) = PromptForPlayerName("\nEnter your name: ", "Player");
+            if (action != UserFlowAction.Continue)
             {
-                return false;
+                return action;
             }
 
-            AiDifficulty? difficulty = _view.DisplayDifficultyMenu();
-            if (!difficulty.HasValue)
+            string playerName = name!;
+            string? computerName;
+
+            while (true)
             {
-                return false;
+                (action, name) = PromptForPlayerName("Enter computer name (blank = Computer): ", "Computer");
+                if (action != UserFlowAction.Continue)
+                {
+                    return action;
+                }
+
+                computerName = name;
+                if (string.Equals(playerName, computerName, StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Computer name must be different from player name.");
+                    continue;
+                }
+
+                break;
             }
 
-            _player1 = new HumanPlayer('X', name);
-            _player2 = new ComputerPlayer('O', difficulty.Value);
+            (UserFlowAction difficultyAction, AiDifficulty? difficulty) = _view.DisplayDifficultyMenu();
+            if (difficultyAction != UserFlowAction.Continue)
+            {
+                return difficultyAction;
+            }
+
+            _player1 = new HumanPlayer('X', playerName);
+            _player2 = new ComputerPlayer('O', difficulty!.Value, computerName!);
         }
 
         _currentPlayer = _player1;
@@ -109,28 +173,24 @@ public class GameController
         Console.WriteLine($"{_player2.Name} will play as 'O'");
 
         // Poka-yoke gate: explicit Enter starts the cycle; Escape must be confirmed in exit menu.
-        if (!ConsolePrompts.WaitForEnterWithEscape("\nPress Enter to start the game (Esc for exit menu): "))
-        {
-            return false;
-        }
-
-        return true;
+        return ConsolePrompts.WaitForEnterWithEscape("\nPress Enter to start the game (Esc for exit menu): ");
     }
 
-    private static string? PromptForPlayerName(string prompt, string defaultName)
+    private static (UserFlowAction Action, string? Name) PromptForPlayerName(string prompt, string defaultName)
     {
         while (true)
         {
-            if (!ConsolePrompts.TryReadLineWithEscape(prompt, out string rawInput))
+            UserFlowAction action = ConsolePrompts.TryReadLineWithEscape(prompt, out string rawInput);
+            if (action != UserFlowAction.Continue)
             {
-                return null;
+                return (action, null);
             }
 
             string normalizedName = NormalizeName(rawInput);
 
             if (string.IsNullOrEmpty(normalizedName))
             {
-                return defaultName;
+                return (UserFlowAction.Continue, defaultName);
             }
 
             if (normalizedName.Length > 100)
@@ -139,7 +199,7 @@ public class GameController
                 continue;
             }
 
-            return normalizedName;
+            return (UserFlowAction.Continue, normalizedName);
         }
     }
 
@@ -193,8 +253,8 @@ public class GameController
     /// <summary>
     /// Main game loop - alternates turns until win or draw.
     /// </summary>
-    /// <returns>True if game ended normally, false if user requested exit.</returns>
-    private bool PlayGame()
+    /// <returns>Flow action after gameplay prompt handling.</returns>
+    private UserFlowAction PlayGame()
     {
         bool gameOver = false;
 
@@ -209,9 +269,9 @@ public class GameController
                 // Get the current player's move (demonstrates POLYMORPHISM)
                 column = _currentPlayer!.GetMove(_board);
             }
-            catch (OperationCanceledException)
+            catch (UserFlowException ex)
             {
-                return false;
+                return ex.Action;
             }
 
             // Drop the piece
@@ -237,15 +297,15 @@ public class GameController
             }
             else
             {
-                if (_currentPlayer is ComputerPlayer)
-                {
-                    Console.Clear();
-                    _view.DisplayBoard(_board, droppedRow, droppedCol);
-                    Console.WriteLine($"{_currentPlayer.Name} has made a move.");
+                bool requireMoveAcknowledgement = _currentPlayer is ComputerPlayer || (_player1 is HumanPlayer && _player2 is HumanPlayer);
 
-                    if (!ConsolePrompts.WaitForEnterWithEscape("Press Enter to continue (Esc for exit menu): "))
+                if (requireMoveAcknowledgement)
+                {
+                    Player nextPlayer = GetNextPlayer();
+                    UserFlowAction action = WaitForMoveAcknowledgement(droppedRow, droppedCol, column, nextPlayer);
+                    if (action != UserFlowAction.Continue)
                     {
-                        return false;
+                        return action;
                     }
                 }
 
@@ -254,7 +314,43 @@ public class GameController
             }
         }
 
-        return true;
+        return UserFlowAction.Continue;
+    }
+
+    private UserFlowAction WaitForMoveAcknowledgement(int highlightedRow, int highlightedCol, int column, Player nextPlayer)
+    {
+        while (true)
+        {
+            Console.Clear();
+            _view.DisplayBoard(_board, highlightedRow, highlightedCol);
+            Console.WriteLine($"Move recorded: {_currentPlayer!.Name} ({_currentPlayer.Symbol}) placed in column {column}.");
+            Console.WriteLine($"Next turn: {nextPlayer.Name} ({nextPlayer.Symbol}).");
+            Console.Write("Press Enter to pass control (Esc for exit menu): ");
+
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+            if (key.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                return UserFlowAction.Continue;
+            }
+
+            if (key.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine();
+                UserFlowAction action = ConsolePrompts.ShowExitConfirmation();
+                if (action != UserFlowAction.Continue)
+                {
+                    return action;
+                }
+
+                continue;
+            }
+        }
+    }
+
+    private Player GetNextPlayer()
+    {
+        return (_currentPlayer == _player1) ? _player2! : _player1!;
     }
 
     /// <summary>

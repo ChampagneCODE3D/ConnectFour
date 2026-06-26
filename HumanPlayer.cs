@@ -35,12 +35,15 @@ public class HumanPlayer : Player
             {
                 Console.WriteLine();
 
-                if (ConsolePrompts.ShowExitConfirmation())
+                UserFlowAction action = ConsolePrompts.ShowExitConfirmation();
+                if (action == UserFlowAction.ExitGame || action == UserFlowAction.RestartToMenu)
                 {
-                    throw new OperationCanceledException("Player requested exit.");
+                    throw new UserFlowException(action);
                 }
 
-                Console.WriteLine();
+                Console.Clear();
+                GameView refreshedView = new();
+                refreshedView.DisplayBoard(board);
                 continue;
             }
 
