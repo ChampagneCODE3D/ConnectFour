@@ -70,13 +70,13 @@ public class GameController
         if (gameMode == 1)
         {
             // Human vs Human
-            string? name1 = PromptForPlayerName("\nPlayer 1, enter your name (or q to quit): ", "Player 1");
+            string? name1 = PromptForPlayerName("\nPlayer 1, enter your name: ", "Player 1");
             if (name1 is null)
             {
                 return false;
             }
 
-            string? name2 = PromptForPlayerName("Player 2, enter your name (or q to quit): ", "Player 2");
+            string? name2 = PromptForPlayerName("Player 2, enter your name: ", "Player 2");
             if (name2 is null)
             {
                 return false;
@@ -88,7 +88,7 @@ public class GameController
         else
         {
             // Human vs Computer
-            string? name = PromptForPlayerName("\nEnter your name (or q to quit): ", "Player");
+            string? name = PromptForPlayerName("\nEnter your name: ", "Player");
             if (name is null)
             {
                 return false;
@@ -110,12 +110,7 @@ public class GameController
     {
         while (true)
         {
-            Console.Write(prompt);
-            string rawInput = Console.ReadLine() ?? string.Empty;
-
-            if (rawInput.Trim().Equals("q", StringComparison.OrdinalIgnoreCase) ||
-                rawInput.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase) ||
-                rawInput.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
+            if (!ConsolePrompts.TryReadLineWithEscape(prompt, out string rawInput))
             {
                 return null;
             }

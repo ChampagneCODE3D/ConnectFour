@@ -23,39 +23,45 @@ public class HumanPlayer : Player
     /// <returns>The column number (1-7) chosen by the player.</returns>
     public override int GetMove(Board board)
     {
-        int column = 0;
-        bool validInput;
-
-        do
+        while (true)
         {
             List<int> availableColumns = GetAvailableColumns(board);
             string availableText = string.Join(", ", availableColumns);
 
-            Console.Write($"{Name} ({Symbol}), enter column ({availableText}) or q to quit: ");
-            string normalizedInput = (Console.ReadLine() ?? string.Empty).Trim();
+            Console.Write($"{Name} ({Symbol}), enter column ({availableText}): ");
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
 
-            if (normalizedInput.Equals("q", StringComparison.OrdinalIgnoreCase) ||
-                normalizedInput.Equals("quit", StringComparison.OrdinalIgnoreCase) ||
-                normalizedInput.Equals("exit", StringComparison.OrdinalIgnoreCase))
+            if (key.Key == ConsoleKey.Escape)
             {
-                throw new OperationCanceledException("Player requested exit.");
+                Console.WriteLine();
+
+                if (ConsolePrompts.ShowExitConfirmation())
+                {
+                    throw new OperationCanceledException("Player requested exit.");
+                }
+
+                Console.WriteLine();
+                continue;
             }
 
-            validInput = normalizedInput.Length == 1 && normalizedInput[0] >= '1' && normalizedInput[0] <= '7';
+            Console.WriteLine(key.KeyChar);
 
-            if (validInput)
-            {
-                column = normalizedInput[0] - '0';
-                validInput = board.IsColumnAvailable(column);
-            }
-
-            if (!validInput)
+            if (key.KeyChar < '1' || key.KeyChar > '7')
             {
                 Console.WriteLine($"Invalid move. Choose one of: {availableText}.");
+                continue;
             }
-        } while (!validInput);
 
-        return column;
+            int column = key.KeyChar - '0';
+
+            if (!board.IsColumnAvailable(column))
+            {
+                Console.WriteLine($"Invalid move. Choose one of: {availableText}.");
+                continue;
+            }
+
+            return column;
+        }
     }
 
     private static List<int> GetAvailableColumns(Board board)
