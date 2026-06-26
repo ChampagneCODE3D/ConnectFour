@@ -4,6 +4,8 @@ public static class ConsolePrompts
 {
     public static UserFlowAction ShowExitConfirmation()
     {
+        int menuStartTop = Console.CursorTop;
+
         Console.WriteLine();
         Console.WriteLine("Exit Menu");
         Console.WriteLine("1. Return to game");
@@ -18,6 +20,8 @@ public static class ConsolePrompts
             if (key.KeyChar == '1')
             {
                 Console.WriteLine('1');
+                ClearRenderedLines(menuStartTop, Console.CursorTop);
+                Console.SetCursorPosition(0, menuStartTop);
                 return UserFlowAction.Continue;
             }
 
@@ -32,6 +36,22 @@ public static class ConsolePrompts
                 Console.WriteLine('3');
                 return UserFlowAction.ExitGame;
             }
+        }
+    }
+
+    private static void ClearRenderedLines(int startTop, int endTop)
+    {
+        if (endTop < startTop)
+        {
+            return;
+        }
+
+        string blankLine = new(' ', Console.WindowWidth);
+
+        for (int line = startTop; line <= endTop; line++)
+        {
+            Console.SetCursorPosition(0, line);
+            Console.Write(blankLine);
         }
     }
 
@@ -76,6 +96,7 @@ public static class ConsolePrompts
     {
         while (true)
         {
+            int promptTop = Console.CursorTop;
             Console.Write(prompt);
             List<char> chars = new();
 
@@ -94,7 +115,8 @@ public static class ConsolePrompts
                         return action;
                     }
 
-                    Console.WriteLine();
+                    ClearRenderedLines(promptTop, promptTop);
+                    Console.SetCursorPosition(0, promptTop);
                     break;
                 }
 

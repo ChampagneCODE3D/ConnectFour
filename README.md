@@ -12,7 +12,8 @@ A console-based Connect Four game built in C# using Object-Oriented Programming 
 1. Run the program
 2. Choose a game mode: Human vs Human or Human vs Computer
 3. Players take turns entering a column number (1–7) to drop their disc
-4. First player to connect 4 in a row (horizontal, vertical, or diagonal) wins!
+4. Gameplay screen shows active mode and player names (and AI difficulty in Human vs Computer)
+5. First player to connect 4 in a row (horizontal, vertical, or diagonal) wins!
 
 ---
 
@@ -80,7 +81,7 @@ This mirrors PLC production safety patterns: deliberate operator acknowledgment,
 - [x] Human vs Human works end-to-end
 - [x] Win detection working for all directions
 - [x] Draw detection working
-- [x] Play again / return to start screen
+- [x] Replay with same players/settings (`y`) or open post-game options (`n`)
 
 ### Milestone 6 — AI Mode (Optional) ✅
 - [x] Human vs Computer mode selectable from menu
@@ -115,7 +116,7 @@ This mirrors PLC production safety patterns: deliberate operator acknowledgment,
 - Win detection for horizontal, vertical, and both diagonal directions.
 - Draw detection.
 - Human vs Human and Human vs Computer game modes.
-- Replay/start-screen flow after each game.
+- Replay flow after each game: rematch, return to start menu, quit, and HvC difficulty-change path.
 
 ---
 
@@ -124,7 +125,7 @@ This mirrors PLC production safety patterns: deliberate operator acknowledgment,
 - [x] Console application runs successfully (`dotnet run`)
 - [x] Automated tests pass (`dotnet test`)
 - [x] Build is successful (`dotnet build`)
-- [ ] Manual UI checklist completed in `TESTING.md`
+- [x] Manual UI checklist completed in `TESTING.md`
 - [ ] Demo video recorded and uploaded
 - [ ] Final commit pushed to GitHub
 - [ ] Repository link submitted in D2L

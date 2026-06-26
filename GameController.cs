@@ -59,12 +59,102 @@ public class GameController
                     break;
                 }
 
-                UserFlowAction postGameAction = _view.AskPostGameAction();
+                bool isHumanVsComputer = _player2 is ComputerPlayer;
+                UserFlowAction postGameAction = _view.AskPostGameAction(isHumanVsComputer);
                 if (postGameAction == UserFlowAction.Continue)
                 {
                     _board = new Board();
                     _currentPlayer = _player1;
                     continue;
+                }
+
+                if (postGameAction == UserFlowAction.ChangeDifficulty)
+                {
+                    if (_player1 is HumanPlayer human && _player2 is ComputerPlayer cpu)
+                    {
+                        Console.Clear();
+
+                        (UserFlowAction difficultyAction, AiDifficulty? difficulty) = _view.DisplayDifficultyMenu();
+                        if (difficultyAction == UserFlowAction.RestartToMenu)
+                        {
+                            _view.DisplayWelcome();
+                            break;
+                        }
+
+                        if (difficultyAction == UserFlowAction.ExitGame)
+                        {
+                            exitGame = true;
+                            break;
+                        }
+
+                        (UserFlowAction nameAction, string? updatedPlayerNameRaw) = PromptForPlayerName($"Enter your name (blank = {human.Name}): ", human.Name);
+                        if (nameAction == UserFlowAction.RestartToMenu)
+                        {
+                            _view.DisplayWelcome();
+                            break;
+                        }
+
+                        if (nameAction == UserFlowAction.ExitGame)
+                        {
+                            exitGame = true;
+                            break;
+                        }
+
+                        string updatedPlayerName = updatedPlayerNameRaw!;
+                        bool restartToMenu = false;
+                        bool reconfiguredMatch = false;
+
+                        while (true)
+                        {
+                            (nameAction, string? updatedComputerNameRaw) = PromptForPlayerName($"Enter computer name (blank = {cpu.Name}): ", cpu.Name);
+                            if (nameAction == UserFlowAction.RestartToMenu)
+                            {
+                                _view.DisplayWelcome();
+                                restartToMenu = true;
+                                break;
+                            }
+
+                            if (nameAction == UserFlowAction.ExitGame)
+                            {
+                                exitGame = true;
+                                break;
+                            }
+
+                            string updatedComputerName = updatedComputerNameRaw!;
+                            if (string.Equals(updatedPlayerName, updatedComputerName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                Console.WriteLine("Computer name must be different from player name.");
+                                continue;
+                            }
+
+                            _player1 = new HumanPlayer(human.Symbol, updatedPlayerName);
+                            _player2 = new ComputerPlayer(cpu.Symbol, difficulty!.Value, updatedComputerName);
+                            _board = new Board();
+                            _currentPlayer = _player1;
+                            reconfiguredMatch = true;
+                            break;
+                        }
+
+                        if (exitGame)
+                        {
+                            break;
+                        }
+
+                        if (reconfiguredMatch)
+                        {
+                            continue;
+                        }
+
+                        if (restartToMenu)
+                        {
+                            break;
+                        }
+
+                        break;
+                    }
+
+                    _view.DisplayWelcome();
+                    break;
                 }
 
                 if (postGameAction == UserFlowAction.RestartToMenu)
@@ -193,9 +283,9 @@ public class GameController
                 return (UserFlowAction.Continue, defaultName);
             }
 
-            if (normalizedName.Length > 100)
+            if (normalizedName.Length > 50)
             {
-                Console.WriteLine("Name is too long. Use 100 characters or fewer.");
+                Console.WriteLine("Name is too long. Use 50 characters or fewer.");
                 continue;
             }
 
@@ -262,6 +352,7 @@ public class GameController
         {
             Console.Clear();
             _view.DisplayBoard(_board);
+            DisplayMatchInfo();
 
             int column;
             try
@@ -319,13 +410,26 @@ public class GameController
 
     private UserFlowAction WaitForMoveAcknowledgement(int highlightedRow, int highlightedCol, int column, Player nextPlayer)
     {
+        bool isHumanVsHuman = _player1 is HumanPlayer && _player2 is HumanPlayer;
+
         while (true)
         {
             Console.Clear();
             _view.DisplayBoard(_board, highlightedRow, highlightedCol);
+            DisplayMatchInfo();
+
             Console.WriteLine($"Move recorded: {_currentPlayer!.Name} ({_currentPlayer.Symbol}) placed in column {column}.");
-            Console.WriteLine($"Next turn: {nextPlayer.Name} ({nextPlayer.Symbol}).");
-            Console.Write("Press Enter to pass control (Esc for exit menu): ");
+
+            if (isHumanVsHuman)
+            {
+                Console.WriteLine($"Next turn: {nextPlayer.Name} ({nextPlayer.Symbol}).");
+                Console.Write("Press Enter to pass control (Esc for exit menu): ");
+            }
+            else
+            {
+                Console.WriteLine($"{nextPlayer.Name} ({nextPlayer.Symbol}), your turn is ready.");
+                Console.Write("Press Enter to continue (Esc for exit menu): ");
+            }
 
             ConsoleKeyInfo key = Console.ReadKey(intercept: true);
             if (key.Key == ConsoleKey.Enter)
@@ -351,6 +455,27 @@ public class GameController
     private Player GetNextPlayer()
     {
         return (_currentPlayer == _player1) ? _player2! : _player1!;
+    }
+
+    private void DisplayMatchInfo()
+    {
+        if (_player1 == null || _player2 == null)
+        {
+            return;
+        }
+
+        if (_player2 is ComputerPlayer computer)
+        {
+            Console.WriteLine("Mode: Human vs Computer");
+            Console.WriteLine($"Players: {_player1.Name} ({_player1.Symbol}) vs {computer.Name} ({computer.Symbol})");
+            Console.WriteLine($"AI Difficulty: {computer.Difficulty}");
+            Console.WriteLine();
+            return;
+        }
+
+        Console.WriteLine("Mode: Human vs Human");
+        Console.WriteLine($"Players: {_player1.Name} ({_player1.Symbol}) vs {_player2.Name} ({_player2.Symbol})");
+        Console.WriteLine();
     }
 
     /// <summary>

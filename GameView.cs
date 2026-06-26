@@ -209,41 +209,85 @@ public class GameView
     /// Asks for post-game next action.
     /// </summary>
     /// <returns>User flow action for rematch, main menu, or exit.</returns>
-    public UserFlowAction AskPostGameAction()
+    public UserFlowAction AskPostGameAction(bool isHumanVsComputer)
     {
         while (true)
         {
-            UserFlowAction action = ConsolePrompts.TryReadLineWithEscape("Play again with same players? (y/n): ", out string rawInput);
-            if (action == UserFlowAction.ExitGame)
+            int promptTop = Console.CursorTop;
+            Console.Write("Play again with same players? (y/n): ");
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+
+            if (key.Key == ConsoleKey.Escape)
             {
-                return UserFlowAction.ExitGame;
+                Console.WriteLine();
+                UserFlowAction action = ConsolePrompts.ShowExitConfirmation();
+                if (action != UserFlowAction.Continue)
+                {
+                    return action;
+                }
+
+                Console.SetCursorPosition(0, promptTop);
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(0, promptTop);
+                continue;
             }
 
-            if (action == UserFlowAction.RestartToMenu)
-            {
-                return UserFlowAction.RestartToMenu;
-            }
+            char choice = char.ToLowerInvariant(key.KeyChar);
 
-            string input = rawInput.Trim().ToLowerInvariant();
-
-            if (input == "y" || input == "yes")
+            if (choice == 'y')
             {
+                Console.WriteLine('y');
                 return UserFlowAction.Continue;
             }
 
-            if (input == "n" || input == "no")
+            if (choice == 'n')
             {
-                return ShowModeOrQuitMenu();
+                Console.WriteLine('n');
+                return ShowPostGameMenu(isHumanVsComputer);
             }
 
-            Console.WriteLine("Invalid choice. Enter y or n.");
+            Console.SetCursorPosition(0, promptTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, promptTop);
         }
     }
 
-    private static UserFlowAction ShowModeOrQuitMenu()
+    private static UserFlowAction ShowPostGameMenu(bool isHumanVsComputer)
     {
         Console.WriteLine();
         Console.WriteLine("Next Step");
+
+        if (isHumanVsComputer)
+        {
+            Console.WriteLine("1. Return to start menu");
+            Console.WriteLine("2. Change AI difficulty");
+            Console.WriteLine("3. Quit game");
+            Console.Write("Choose 1, 2, or 3: ");
+
+            while (true)
+            {
+                ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+
+                if (key.KeyChar == '1')
+                {
+                    Console.WriteLine('1');
+                    return UserFlowAction.RestartToMenu;
+                }
+
+                if (key.KeyChar == '2')
+                {
+                    Console.WriteLine('2');
+                    return UserFlowAction.ChangeDifficulty;
+                }
+
+                if (key.KeyChar == '3' || key.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine('3');
+                    return UserFlowAction.ExitGame;
+                }
+            }
+        }
+
         Console.WriteLine("1. Return to start menu");
         Console.WriteLine("2. Quit game");
         Console.Write("Choose 1 or 2: ");

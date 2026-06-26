@@ -9,6 +9,8 @@ public class ComputerPlayer : Player
     private readonly Random _random = new Random();
     private readonly AiDifficulty _difficulty;
 
+    public AiDifficulty Difficulty => _difficulty;
+
     /// <summary>
     /// Initializes a new computer player.
     /// </summary>
