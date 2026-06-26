@@ -49,18 +49,20 @@ public class GameView
         Console.WriteLine();
         Console.WriteLine("Objective: Connect four of your symbols");
         Console.WriteLine("horizontally, vertically, or diagonally!");
+        Console.WriteLine("Tip: Press Esc at menu, or type 'q' during prompts, to quit.");
         Console.WriteLine();
     }
 
     /// <summary>
     /// Displays the main menu and gets the player's choice.
     /// </summary>
-    /// <returns>1 for Human vs Human, 2 for Human vs Computer.</returns>
+    /// <returns>1 for Human vs Human, 2 for Human vs Computer, or 0 to exit.</returns>
     public int DisplayMenu()
     {
         Console.WriteLine("SELECT GAME MODE:");
         Console.WriteLine("1. Human vs Human");
         Console.WriteLine("2. Human vs Computer");
+        Console.WriteLine("Esc. Exit");
         Console.WriteLine();
 
         Console.Write("Enter your choice (1 or 2): ");
@@ -68,6 +70,12 @@ public class GameView
         while (true)
         {
             ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+
+            if (key.Key == ConsoleKey.Escape || key.KeyChar == 'q' || key.KeyChar == 'Q')
+            {
+                Console.WriteLine("Esc");
+                return 0;
+            }
 
             if (key.KeyChar == '1' || key.KeyChar == '2')
             {
@@ -108,9 +116,23 @@ public class GameView
     /// <returns>True if they want to play again, false otherwise.</returns>
     public bool AskPlayAgain()
     {
-        Console.Write("Play again? (y/n): ");
-        string? input = Console.ReadLine()?.ToLower();
-        return input == "y" || input == "yes";
+        while (true)
+        {
+            Console.Write("Play again? (y/n, or q to quit): ");
+            string input = (Console.ReadLine() ?? string.Empty).Trim().ToLowerInvariant();
+
+            if (input == "y" || input == "yes")
+            {
+                return true;
+            }
+
+            if (input == "n" || input == "no" || input == "q" || input == "quit" || input == "exit")
+            {
+                return false;
+            }
+
+            Console.WriteLine("Invalid choice. Enter y, n, or q.");
+        }
     }
 
     /// <summary>

@@ -31,8 +31,15 @@ public class HumanPlayer : Player
             List<int> availableColumns = GetAvailableColumns(board);
             string availableText = string.Join(", ", availableColumns);
 
-            Console.Write($"{Name} ({Symbol}), enter column ({availableText}): ");
+            Console.Write($"{Name} ({Symbol}), enter column ({availableText}) or q to quit: ");
             string normalizedInput = (Console.ReadLine() ?? string.Empty).Trim();
+
+            if (normalizedInput.Equals("q", StringComparison.OrdinalIgnoreCase) ||
+                normalizedInput.Equals("quit", StringComparison.OrdinalIgnoreCase) ||
+                normalizedInput.Equals("exit", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new OperationCanceledException("Player requested exit.");
+            }
 
             validInput = normalizedInput.Length == 1 && normalizedInput[0] >= '1' && normalizedInput[0] <= '7';
 

@@ -32,10 +32,18 @@ public class GameController
 
         while (playAgain)
         {
-            SetupGame();
-            PlayGame();
+            if (!SetupGame())
+            {
+                break;
+            }
+
+            if (!PlayGame())
+            {
+                break;
+            }
+
             playAgain = _view.AskPlayAgain();
-            
+
             if (playAgain)
             {
                 _view.DisplayWelcome();
@@ -48,26 +56,30 @@ public class GameController
     /// <summary>
     /// Sets up the game based on the selected game mode.
     /// </summary>
-    private void SetupGame()
+    /// <returns>True if setup completed, false if user requested exit.</returns>
+    private bool SetupGame()
     {
         int gameMode = _view.DisplayMenu();
+        if (gameMode == 0)
+        {
+            return false;
+        }
+
         _board = new Board();
 
         if (gameMode == 1)
         {
             // Human vs Human
-            Console.Write("\nPlayer 1, enter your name: ");
-            string? name1 = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(name1))
+            string? name1 = PromptForPlayerName("\nPlayer 1, enter your name (or q to quit): ", "Player 1");
+            if (name1 is null)
             {
-                name1 = "Player 1";
+                return false;
             }
 
-            Console.Write("Player 2, enter your name: ");
-            string? name2 = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(name2))
+            string? name2 = PromptForPlayerName("Player 2, enter your name (or q to quit): ", "Player 2");
+            if (name2 is null)
             {
-                name2 = "Player 2";
+                return false;
             }
 
             _player1 = new HumanPlayer('X', name1);
@@ -76,11 +88,10 @@ public class GameController
         else
         {
             // Human vs Computer
-            Console.Write("\nEnter your name: ");
-            string? name = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(name))
+            string? name = PromptForPlayerName("\nEnter your name (or q to quit): ", "Player");
+            if (name is null)
             {
-                name = "Player";
+                return false;
             }
 
             _player1 = new HumanPlayer('X', name);
@@ -92,12 +103,76 @@ public class GameController
         Console.WriteLine($"{_player2.Name} will play as 'O'");
         Console.WriteLine("\nPress any key to start the game...");
         Console.ReadKey();
+        return true;
+    }
+
+    private static string? PromptForPlayerName(string prompt, string defaultName)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string rawInput = Console.ReadLine() ?? string.Empty;
+
+            if (rawInput.Trim().Equals("q", StringComparison.OrdinalIgnoreCase) ||
+                rawInput.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase) ||
+                rawInput.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            string normalizedName = NormalizeName(rawInput);
+
+            if (string.IsNullOrEmpty(normalizedName))
+            {
+                return defaultName;
+            }
+
+            if (normalizedName.Length > 100)
+            {
+                Console.WriteLine("Name is too long. Use 100 characters or fewer.");
+                continue;
+            }
+
+            return normalizedName;
+        }
+    }
+
+    private static string NormalizeName(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return string.Empty;
+        }
+
+        string trimmed = input.Trim();
+        List<char> normalizedChars = new();
+        bool previousWasSpace = false;
+
+        foreach (char c in trimmed)
+        {
+            if (char.IsWhiteSpace(c))
+            {
+                if (!previousWasSpace)
+                {
+                    normalizedChars.Add(' ');
+                    previousWasSpace = true;
+                }
+
+                continue;
+            }
+
+            normalizedChars.Add(c);
+            previousWasSpace = false;
+        }
+
+        return new string([.. normalizedChars]);
     }
 
     /// <summary>
     /// Main game loop - alternates turns until win or draw.
     /// </summary>
-    private void PlayGame()
+    /// <returns>True if game ended normally, false if user requested exit.</returns>
+    private bool PlayGame()
     {
         bool gameOver = false;
 
@@ -106,8 +181,16 @@ public class GameController
             Console.Clear();
             _view.DisplayBoard(_board);
 
-            // Get the current player's move (demonstrates POLYMORPHISM)
-            int column = _currentPlayer!.GetMove(_board);
+            int column;
+            try
+            {
+                // Get the current player's move (demonstrates POLYMORPHISM)
+                column = _currentPlayer!.GetMove(_board);
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
 
             // Drop the piece
             _board.DropPiece(column, _currentPlayer.Symbol);
@@ -134,6 +217,8 @@ public class GameController
                 SwitchPlayer();
             }
         }
+
+        return true;
     }
 
     /// <summary>
