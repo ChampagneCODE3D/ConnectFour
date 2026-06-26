@@ -37,6 +37,27 @@ A console-based Connect Four game built in C# using Object-Oriented Programming 
 - **Inheritance** — `HumanPlayer` and `ComputerPlayer` both extend `Player`
 - **Polymorphism** — `GameController` calls `player.GetMove()` without knowing if it's human or AI
 
+## PLC Production Line Analogy
+
+For process-control thinking (PLC style), this project maps as follows:
+
+- `Program.cs` + `GameController.cs` = main production control routine that sequences each cycle.
+- `Board.cs` = machine status/state memory table (safe read/write rules).
+- `Player.cs` + `HumanPlayer.cs` + `ComputerPlayer.cs` = different stations/actors providing the next action.
+- `GameView.cs` = HMI layer for operator prompts, status, and alarm-style feedback.
+
+This is why the project uses multiple `.cs` files instead of one monolithic file: each module has one clear job, like separate PLC routines.
+
+### PLC Poka-yoke (Fail-Safe) UI Fix
+
+A recent UI bug fix was implemented using a **Poka-yoke** mindset:
+
+- Problem: accidental key carryover (especially around `Esc`) could advance prompts unexpectedly.
+- Fix: progression gates now require **explicit Enter** for affirmative actions.
+- Safety path: `Esc` always routes to an **exit confirmation menu** (Return vs Exit), instead of directly advancing state.
+
+This mirrors PLC production safety patterns: deliberate operator acknowledgment, guarded transitions, and explicit confirmation before changing process state.
+
 ---
 
 ## Task Breakdown

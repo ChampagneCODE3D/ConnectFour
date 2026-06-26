@@ -107,8 +107,13 @@ public class GameController
         _currentPlayer = _player1;
         Console.WriteLine($"\n{_player1.Name} will play as 'X'");
         Console.WriteLine($"{_player2.Name} will play as 'O'");
-        Console.WriteLine("\nPress any key to start the game...");
-        Console.ReadKey();
+
+        // Poka-yoke gate: explicit Enter starts the cycle; Escape must be confirmed in exit menu.
+        if (!ConsolePrompts.WaitForEnterWithEscape("\nPress Enter to start the game (Esc for exit menu): "))
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -169,6 +174,22 @@ public class GameController
         return new string([.. normalizedChars]);
     }
 
+    private int GetTopOccupiedRow(int column)
+    {
+        char[,] grid = _board.GetGrid();
+        int colIndex = column - 1;
+
+        for (int row = 0; row < 6; row++)
+        {
+            if (grid[row, colIndex] != ' ')
+            {
+                return row;
+            }
+        }
+
+        return 5;
+    }
+
     /// <summary>
     /// Main game loop - alternates turns until win or draw.
     /// </summary>
@@ -195,6 +216,8 @@ public class GameController
 
             // Drop the piece
             _board.DropPiece(column, _currentPlayer.Symbol);
+            int droppedRow = GetTopOccupiedRow(column);
+            int droppedCol = column - 1;
 
             // Check for win
             if (_board.CheckWin(_currentPlayer.Symbol))
@@ -214,6 +237,18 @@ public class GameController
             }
             else
             {
+                if (_currentPlayer is ComputerPlayer)
+                {
+                    Console.Clear();
+                    _view.DisplayBoard(_board, droppedRow, droppedCol);
+                    Console.WriteLine($"{_currentPlayer.Name} has made a move.");
+
+                    if (!ConsolePrompts.WaitForEnterWithEscape("Press Enter to continue (Esc for exit menu): "))
+                    {
+                        return false;
+                    }
+                }
+
                 // Switch to the next player
                 SwitchPlayer();
             }

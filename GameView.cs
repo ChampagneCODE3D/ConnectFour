@@ -10,7 +10,7 @@ public class GameView
     /// Displays the current state of the game board.
     /// </summary>
     /// <param name="board">The board to display.</param>
-    public void DisplayBoard(Board board)
+    public void DisplayBoard(Board board, int? highlightedRow = null, int? highlightedCol = null)
     {
         char[,] grid = board.GetGrid();
         Console.WriteLine();
@@ -22,7 +22,29 @@ public class GameView
             Console.Write("│");
             for (int col = 0; col < 7; col++)
             {
-                Console.Write($" {grid[row, col]} │");
+                char cell = grid[row, col];
+                bool isHighlighted = highlightedRow == row && highlightedCol == col;
+                ConsoleColor pieceColor = cell switch
+                {
+                    'X' => ConsoleColor.Red,
+                    'O' => ConsoleColor.Yellow,
+                    _ => ConsoleColor.Gray
+                };
+
+                if (isHighlighted)
+                {
+                    Console.BackgroundColor = pieceColor;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                }
+                else
+                {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = pieceColor;
+                }
+
+                Console.Write($" {cell} ");
+                Console.ResetColor();
+                Console.Write("│");
             }
             Console.WriteLine();
 
@@ -81,6 +103,11 @@ public class GameView
                 }
 
                 Console.WriteLine();
+                Console.WriteLine("SELECT GAME MODE:");
+                Console.WriteLine("1. Human vs Human");
+                Console.WriteLine("2. Human vs Computer");
+                Console.WriteLine("Esc. Exit menu");
+                Console.WriteLine();
                 Console.Write("Enter your choice (1 or 2): ");
                 continue;
             }
@@ -122,6 +149,12 @@ public class GameView
                     return null;
                 }
 
+                Console.WriteLine();
+                Console.WriteLine("SELECT AI DIFFICULTY:");
+                Console.WriteLine("1. Easy (random moves)");
+                Console.WriteLine("2. Medium (win/block strategy)");
+                Console.WriteLine("3. Hard (stronger positioning)");
+                Console.WriteLine("Esc. Exit menu");
                 Console.WriteLine();
                 Console.Write("Enter your choice (1, 2, or 3): ");
                 continue;

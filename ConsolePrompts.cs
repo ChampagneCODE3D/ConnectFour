@@ -28,6 +28,42 @@ public static class ConsolePrompts
         }
     }
 
+    /// <summary>
+    /// Poka-yoke style confirmation gate: only Enter advances the flow.
+    /// Escape routes to a confirm-exit menu to prevent accidental progression.
+    /// </summary>
+    public static bool WaitForEnterWithEscape(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+
+            while (true)
+            {
+                ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+
+                if (key.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine();
+
+                    if (ShowExitConfirmation())
+                    {
+                        return false;
+                    }
+
+                    Console.WriteLine();
+                    break;
+                }
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return true;
+                }
+            }
+        }
+    }
+
     public static bool TryReadLineWithEscape(string prompt, out string input)
     {
         while (true)

@@ -9,6 +9,12 @@
 /// - ENCAPSULATION: Board class hides internal grid implementation
 /// - INHERITANCE: HumanPlayer and ComputerPlayer extend Player base class
 /// - POLYMORPHISM: GetMove() method behaves differently for each player type
+/// 
+/// PLC production line analogy:
+/// - Program/GameController = main control routine coordinating each cycle
+/// - Board = machine state table/sensor map
+/// - Player classes = operator/robot stations that submit actions
+/// - GameView = HMI panel for operator interaction and status output
 /// </summary>
 
 GameController game = new GameController();
