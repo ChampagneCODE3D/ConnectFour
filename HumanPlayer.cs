@@ -23,22 +23,27 @@ public class HumanPlayer : Player
     /// <returns>The column number (1-7) chosen by the player.</returns>
     public override int GetMove(Board board)
     {
-        int column;
+        int column = 0;
         bool validInput;
 
         do
         {
             Console.Write($"{Name} ({Symbol}), enter column (1-7): ");
-            string? input = Console.ReadLine();
-            
-            // Validate input is a number between 1 and 7
-            validInput = int.TryParse(input, out column) && column >= 1 && column <= 7;
-            
-            if (!validInput)
+            string normalizedInput = (Console.ReadLine() ?? string.Empty).Trim();
+
+            validInput = normalizedInput.Length == 1 && normalizedInput[0] >= '1' && normalizedInput[0] <= '7';
+
+            if (validInput)
             {
-                Console.WriteLine("Invalid input! Please enter a number between 1 and 7.");
+                column = normalizedInput[0] - '0';
             }
-            else if (!board.IsColumnAvailable(column))
+            else
+            {
+                Console.WriteLine("Invalid input! Please enter only a number from 1 to 7.");
+                continue;
+            }
+
+            if (!board.IsColumnAvailable(column))
             {
                 Console.WriteLine("That column is full! Please choose another column.");
                 validInput = false;
