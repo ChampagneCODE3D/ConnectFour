@@ -28,7 +28,10 @@ public class HumanPlayer : Player
 
         do
         {
-            Console.Write($"{Name} ({Symbol}), enter column (1-7): ");
+            List<int> availableColumns = GetAvailableColumns(board);
+            string availableText = string.Join(", ", availableColumns);
+
+            Console.Write($"{Name} ({Symbol}), enter column ({availableText}): ");
             string normalizedInput = (Console.ReadLine() ?? string.Empty).Trim();
 
             validInput = normalizedInput.Length == 1 && normalizedInput[0] >= '1' && normalizedInput[0] <= '7';
@@ -36,20 +39,30 @@ public class HumanPlayer : Player
             if (validInput)
             {
                 column = normalizedInput[0] - '0';
-            }
-            else
-            {
-                Console.WriteLine("Invalid input! Please enter only a number from 1 to 7.");
-                continue;
+                validInput = board.IsColumnAvailable(column);
             }
 
-            if (!board.IsColumnAvailable(column))
+            if (!validInput)
             {
-                Console.WriteLine("That column is full! Please choose another column.");
-                validInput = false;
+                Console.WriteLine($"Invalid move. Choose one of: {availableText}.");
             }
         } while (!validInput);
 
         return column;
+    }
+
+    private static List<int> GetAvailableColumns(Board board)
+    {
+        List<int> availableColumns = new();
+
+        for (int col = 1; col <= 7; col++)
+        {
+            if (board.IsColumnAvailable(col))
+            {
+                availableColumns.Add(col);
+            }
+        }
+
+        return availableColumns;
     }
 }

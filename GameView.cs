@@ -62,27 +62,19 @@ public class GameView
         Console.WriteLine("1. Human vs Human");
         Console.WriteLine("2. Human vs Computer");
         Console.WriteLine();
-        
-        int choice = 0;
-        bool validInput;
 
-        do
+        Console.Write("Enter your choice (1 or 2): ");
+
+        while (true)
         {
-            Console.Write("Enter your choice (1 or 2): ");
-            string normalizedInput = (Console.ReadLine() ?? string.Empty).Trim();
-            validInput = normalizedInput == "1" || normalizedInput == "2";
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
 
-            if (validInput)
+            if (key.KeyChar == '1' || key.KeyChar == '2')
             {
-                choice = normalizedInput == "1" ? 1 : 2;
+                Console.WriteLine(key.KeyChar);
+                return key.KeyChar - '0';
             }
-            else
-            {
-                Console.WriteLine("Invalid choice! Please enter only 1 or 2.");
-            }
-        } while (!validInput);
-
-        return choice;
+        }
     }
 
     /// <summary>
